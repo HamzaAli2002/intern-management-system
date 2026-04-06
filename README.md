@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🎓 Intern Management System
-### Built for **[Internee.pk](https://internee.pk)** — Flutter Internship Task #1
+### Built for **[Internee.pk](https://internee.pk)** Flutter Internship Task #1
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter)](https://flutter.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
@@ -16,39 +16,39 @@ A **fully functional cross-platform mobile app** to manage intern profiles, trac
 
 ---
 
-## 📌 About This Project
+## About This Project
 
 This project was developed as **Task #1** of the Flutter internship at **Internee.pk**. The goal was to build a centralized platform where admins can manage intern profiles and assign tasks, while interns can track their progress and submit work via GitHub and LinkedIn links.
 
 ---
 
-## ✨ Features
+## Features
 
-### 👤 Intern Features
+### Intern Features
 | Feature | Description |
 |---------|-------------|
-| 🔐 Secure Login | Firebase Authentication with email & password |
-| 📊 Dashboard | Progress ring, task stats, filter by status |
-| 📋 Task View | Full task details with priority, category, due date |
-| 🚀 Start Task | Mark task as In Progress |
-| 🔗 Submit Links | Paste GitHub repo + LinkedIn post URL as submission |
-| ✏️ Edit Submission | Update note and links before/after review |
-| 🔄 Re-submit | After admin requests revision |
-| 💬 View Remarks | See admin's feedback in color-coded remark card |
+| Secure Login | Firebase Authentication with email & password |
+| Dashboard | Progress ring, task stats, filter by status |
+| Task View | Full task details with priority, category, due date |
+| Start Task | Mark task as In Progress |
+| Submit Links | Paste GitHub repo + LinkedIn post URL as submission |
+| Edit Submission | Update note and links before/after review |
+| Re-submit | After admin requests revision |
+| View Remarks | See admin's feedback in color-coded remark card |
 
-### 🛡️ Admin Features
+### Admin Features
 | Feature | Description |
 |---------|-------------|
-| ➕ Register Interns | Create Firebase Auth + Firestore profile in one step |
-| 📝 Assign Tasks | Set priority, category, due date, assignee |
-| 👥 Manage Interns | Search, filter, view profiles, update status |
-| 📤 Review Tab | See all submitted tasks awaiting review |
-| ✅ Give Remarks | Approve / Request Revision / Reject with written feedback |
-| 🗑️ Delete Intern | Removes auth profile and all associated tasks |
+| Register Interns | Create Firebase Auth + Firestore profile in one step |
+| Assign Tasks | Set priority, category, due date, assignee |
+| Manage Interns | Search, filter, view profiles, update status |
+| Review Tab | See all submitted tasks awaiting review |
+| Give Remarks | Approve / Request Revision / Reject with written feedback |
+| Delete Intern | Removes auth profile and all associated tasks |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -61,7 +61,7 @@ This project was developed as **Task #1** of the Flutter internship at **Interne
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 lib/
@@ -100,7 +100,7 @@ lib/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - [Flutter SDK 3.x](https://docs.flutter.dev/get-started/install)
@@ -124,7 +124,7 @@ cd intern-management-system
 dart pub global activate flutterfire_cli
 flutterfire configure --platforms=android,ios
 ```
-This auto-generates `lib/firebase_options.dart` ✅
+This auto-generates `lib/firebase_options.dart`
 
 ### 4. Install Dependencies
 ```bash
@@ -166,7 +166,7 @@ flutter run -d <device>  # run on your device
 
 ---
 
-## 🔄 Task Lifecycle
+## Task Lifecycle
 
 ```
 Assigned (pending)
@@ -176,16 +176,16 @@ In Progress
 Submitted ──────────────► Admin sees it in Review Tab
                                ↓
           ┌────────────────────────────────────────┐
-          │ ✅ Approved  →  Completed               │
-          │ 🔄 Needs Revision  →  back In Progress  │
+          │ Approved  →  Completed               │
+          │ Needs Revision  →  back In Progress  │
           │    (intern edits links/note & re-submits)│
-          │ ❌ Rejected  →  back to Pending         │
+          │ Rejected  →  back to Pending         │
           └────────────────────────────────────────┘
 ```
 
 ---
 
-## 🗄️ Firestore Schema
+## Firestore Schema
 
 ### `users/{uid}`
 ```json
@@ -231,17 +231,8 @@ Submitted ──────────────► Admin sees it in Review 
 
 ---
 
-## 📱 Screenshots
 
-> *(Add screenshots here after running the app)*
-
-| Login | Intern Dashboard | Task Detail | Admin Panel | Review |
-|-------|-----------------|-------------|-------------|--------|
-| ![](assets/images/login.png) | ![](assets/images/dashboard.png) | ![](assets/images/task.png) | ![](assets/images/admin.png) | ![](assets/images/review.png) |
-
----
-
-## 🔑 Key Technical Decisions
+## Key Technical Decisions
 
 ### Secondary Firebase App for Intern Registration
 When an admin registers a new intern, Firebase's `createUserWithEmailAndPassword()` automatically signs in the new user, which would log out the admin. This app solves it by creating a **temporary secondary Firebase App instance** for registration, keeping the admin session intact.
@@ -254,21 +245,21 @@ All data uses `StreamBuilder` with Firestore `.snapshots()`. Every change reflec
 
 ---
 
-## 🧑‍💻 Author
+## Author
 
 **[Your Name]**
-- 🌐 GitHub: [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-- 💼 LinkedIn: [Your Name](https://linkedin.com/in/YOUR_PROFILE)
-- 🏢 Flutter Intern @ [Internee.pk](https://internee.pk)
+-  GitHub: [@HamzaAli2002](https://github.com/HamzaAli2002)
+-  LinkedIn: [Muhammad Hamza Ali](https://www.linkedin.com/in/muhammad-hamza-ali-3131a825b/?skipRedirect=true)
+-  Flutter Intern @ [Internee.pk](https://internee.pk)
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
-Made with ❤️ using Flutter & Firebase | Internee.pk Flutter Internship 2024
+Made with using Flutter & Firebase | Internee.pk Flutter Internship 2026    
 </div>
