@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "519520193791",
+    "project_id": "internee-pk-ims",
+    "storage_bucket": "internee-pk-ims.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519520193791:android:76b1e9a549a6ffe54e10ca",
+        "android_client_info": {
+          "package_name": "com.example.intern_management_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "519520193791-u3kgl7ne025n3ftn8nkcn0vd8c7r9crc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtGD-uPf6BvvejbUl9x__A7uk9Zu2gQ3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "519520193791-u3kgl7ne025n3ftn8nkcn0vd8c7r9crc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "519520193791-d8kit8pv55fi1vjmuvtp425ahtpa3j1u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.internManagementSystem"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

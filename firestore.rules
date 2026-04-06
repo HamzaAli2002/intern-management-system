@@ -1,0 +1,60 @@
+// ─── firestore.rules ──────────────────────────────────────────────────────
+// Deploy with: firebase deploy --only firestore:rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ── Users Collection ──
+    match /users/{uid} {
+      // Anyone authenticated can read their own profile; Admin reads all
+      allow read: if isOwner(uid) || isAdmin();
+
+      // Admin can create profiles for interns
+      // Also allow any authenticated user to create their own doc
+      // (needed for secondary app registration flow)
+      allow create: if isAdmin() || isOwner(uid);
+
+      // Admin can update any; intern can update only their own
+      allow update: if isAdmin() || isOwner(uid);
+
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // ── Tasks Collection ──
+    match /tasks/{taskId} {
+      // Interns read their own tasks; Admin reads all
+      allow read: if isAuth() &&
+        (resource.data.assignedTo == request.auth.uid || isAdmin());
+
+      // Only admin can create tasks
+      allow create: if isAdmin();
+
+      // Admin can update anything; intern can only update submission fields
+      allow update: if isAdmin() ||
+        (isAuth() &&
+         resource.data.assignedTo == request.auth.uid &&
+         request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['status', 'submissionNote', 'completedAt',
+                     'submittedAt', 'attachments', 'links',
+                     'adminRemark', 'adminReviewStatus', 'reviewedAt']));
+
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+  }
+}
