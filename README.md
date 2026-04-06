@@ -8,9 +8,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-A **fully functional cross-platform mobile app** to manage intern profiles, track tasks, and handle task submissions with admin review — built with Flutter and Firebase.
-
-![App Preview](assets/images/preview.png)
+A **fully functional cross-platform mobile app** to manage intern profiles, track tasks, and handle task submissions with admin review built with Flutter and Firebase.
 
 </div>
 
