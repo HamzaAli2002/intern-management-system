@@ -1,0 +1,1 @@
+ D:\\Internee.pk\\intern_management_system\\.dart_tool\\flutter_build\\2815bf6b868e543177ba7e8550075373\\native_assets.json: 
