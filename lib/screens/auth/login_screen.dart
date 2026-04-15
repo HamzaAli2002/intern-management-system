@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive.dart';
 import '../intern/intern_dashboard.dart';
 import '../admin/admin_dashboard.dart';
 
@@ -76,23 +77,45 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isTablet = size.width >= 600;
-    final formWidth = isTablet ? 520.0 : size.width;
-    final headerH = isTablet ? 260.0 : 240.0;
+    final isMobile = ResponsiveHelper.isMobile(context);
+    final isTablet = ResponsiveHelper.isTablet(context);
+    final screenHeight = ResponsiveHelper.screenHeight(context);
+    final screenWidth = ResponsiveHelper.screenWidth(context);
+
+    // Responsive dimensions
+    final maxFormWidth = isMobile ? screenWidth * 0.9 : 520.0;
+    double headerHeight;
+    if (isMobile) {
+      headerHeight = screenHeight * 0.25;
+    } else if (isTablet) {
+      headerHeight = 260.0;
+    } else {
+      headerHeight = 240.0;
+    }
+
+    final logoSize = isMobile ? 60.0 : 72.0;
+    final titleSize = ResponsiveHelper.fontSize(context,
+        mobileSize: 20, tabletSize: 24, desktopSize: 26);
+    final subtitleSize =
+        ResponsiveHelper.fontSize(context, mobileSize: 12, tabletSize: 13);
+    final cardPadding = ResponsiveHelper.paddingSymmetric(context,
+        mobileH: 20, mobileV: 24, tabletH: 28, desktopH: 32);
+    final cardMargin = ResponsiveHelper.paddingSymmetric(context,
+        mobileH: 16, mobileV: 12, tabletH: 20, tabletV: 16);
+    final gapSize = isMobile ? 16.0 : 20.0;
 
     return Scaffold(
       backgroundColor: AppTheme.primary,
       body: SafeArea(
         child: Center(
-          child: SizedBox(
-            width: formWidth,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxFormWidth),
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // ── Header ──
+                  // ── Responsive Header ──
                   SizedBox(
-                    height: headerH,
+                    height: headerHeight,
                     child: Stack(
                       children: [
                         Positioned.fill(
@@ -103,8 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                width: 72,
-                                height: 72,
+                                width: logoSize,
+                                height: logoSize,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [
@@ -114,7 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius:
+                                      BorderRadius.circular(logoSize * 0.25),
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppTheme.accent.withOpacity(0.4),
@@ -123,32 +147,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ],
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Text('I',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 36,
+                                        fontSize: logoSize * 0.5,
                                         fontWeight: FontWeight.w800,
                                         height: 1,
                                       )),
                                 ),
                               ),
-                              const SizedBox(height: 14),
-                              const Text(
+                              SizedBox(height: gapSize * 0.7),
+                              Text(
                                 'internee.pk',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 26,
+                                  fontSize: titleSize,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 0.5,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: gapSize * 0.3),
                               Text(
                                 'Intern Management System',
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.55),
-                                  fontSize: 13,
+                                  fontSize: subtitleSize,
                                   letterSpacing: 0.8,
                                 ),
                               ),
@@ -161,8 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // ── Form Card ──
                   Container(
-                    margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    padding: const EdgeInsets.all(28),
+                    margin: cardMargin,
+                    padding: cardPadding,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
@@ -180,23 +204,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
+                          ResponsiveText(
                             'Welcome Back 👋',
-                            style: TextStyle(
-                              fontSize: 22,
+                            mobileSize: 20,
+                            tabletSize: 22,
+                            desktopSize: 24,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppTheme.textDark,
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          const Text(
+                          SizedBox(height: gapSize * 0.4),
+                          ResponsiveText(
                             'Sign in to your account',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.textMid,
-                            ),
+                            mobileSize: 13,
+                            tabletSize: 14,
+                            style: const TextStyle(color: AppTheme.textMid),
                           ),
-                          const SizedBox(height: 28),
+                          SizedBox(height: gapSize * 1.5),
 
                           // Email
                           TextFormField(
@@ -215,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: gapSize),
 
                           // Password
                           TextFormField(
@@ -243,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: gapSize * 0.5),
 
                           // Forgot password
                           Align(
@@ -265,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Error message
                           if (_errorMsg != null) ...[
-                            const SizedBox(height: 8),
+                            SizedBox(height: gapSize * 0.5),
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -277,12 +302,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   const Icon(Icons.error_outline,
                                       color: Colors.red, size: 18),
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: gapSize * 0.5),
                                   Expanded(
-                                    child: Text(
+                                    child: ResponsiveText(
                                       _errorMsg!,
-                                      style: const TextStyle(
-                                          color: Colors.red, fontSize: 13),
+                                      mobileSize: 12,
+                                      style: const TextStyle(color: Colors.red),
                                     ),
                                   ),
                                 ],
@@ -290,11 +315,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: gapSize * 1.2),
 
                           // Login Button
                           SizedBox(
-                            height: 52,
+                            height: isMobile ? 48 : 52,
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _login,
                               child: _isLoading
@@ -306,11 +331,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                         strokeWidth: 2.5,
                                       ),
                                     )
-                                  : const Text('Sign In'),
+                                  : ResponsiveText(
+                                      'Sign In',
+                                      mobileSize: 14,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600),
+                                    ),
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          SizedBox(height: gapSize),
 
                           // Demo hint
                           Container(
@@ -319,13 +349,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: AppTheme.accent.withOpacity(0.08),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Text(
+                            child: ResponsiveText(
                               '💡 Admin accounts are created directly in Firebase.\n'
                               'Intern accounts are added by the Admin panel.',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppTheme.textMid,
-                              ),
+                              mobileSize: 11,
+                              tabletSize: 12,
+                              style: const TextStyle(color: AppTheme.textMid),
                               textAlign: TextAlign.center,
                             ),
                           ),

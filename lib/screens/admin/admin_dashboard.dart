@@ -120,27 +120,23 @@ class _AdminDashboardState extends State<AdminDashboard>
   Widget _buildStatsBanner() {
     return Container(
       color: AppTheme.primary,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
       child: FutureBuilder<Map<String, int>>(
         future: _db.getInternStats(),
         builder: (ctx, snap) {
           final stats = snap.data ?? {'active': 0, 'completed': 0, 'inactive': 0};
-          return Row(
-            children: [
-              _statItem('Active', stats['active'] ?? 0, AppTheme.accent),
-              _divider(),
-              _statItem('Completed', stats['completed'] ?? 0, const Color(0xFF3B82F6)),
-              _divider(),
-              _statItem('Inactive', stats['inactive'] ?? 0, Colors.orange),
-              _divider(),
-              _statItem(
-                  'Total',
-                  (stats['active'] ?? 0) +
-                      (stats['completed'] ?? 0) +
-                      (stats['inactive'] ?? 0),
-                  Colors.white),
-            ],
-          );
+          final total = (stats['active'] ?? 0) +
+              (stats['completed'] ?? 0) +
+              (stats['inactive'] ?? 0);
+          return Row(children: [
+            _statItem('Active', stats['active'] ?? 0, AppTheme.accent),
+            _divider(),
+            _statItem('Graduated', stats['completed'] ?? 0, const Color(0xFF3B82F6)),
+            _divider(),
+            _statItem('Inactive', stats['inactive'] ?? 0, Colors.orange),
+            _divider(),
+            _statItem('Total', total, Colors.white),
+          ]);
         },
       ),
     );
@@ -148,26 +144,20 @@ class _AdminDashboardState extends State<AdminDashboard>
 
   Widget _statItem(String label, int count, Color color) {
     return Expanded(
-      child: Column(
-        children: [
-          Text(
-            '$count',
+      child: Column(children: [
+        Text('$count',
             style: TextStyle(
-                color: color, fontSize: 22, fontWeight: FontWeight.w700),
-          ),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white54, fontSize: 11),
-          ),
-        ],
-      ),
+                color: color, fontSize: 20, fontWeight: FontWeight.w700)),
+        Text(label,
+            style: const TextStyle(color: Colors.white54, fontSize: 10),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis),
+      ]),
     );
   }
 
-  Widget _divider() {
-    return Container(
-        width: 1, height: 32, color: Colors.white.withOpacity(0.15));
-  }
+  Widget _divider() =>
+      Container(width: 1, height: 28, color: Colors.white.withOpacity(0.12));
 
   Future<void> _confirmLogout() async {
     final confirm = await showDialog<bool>(

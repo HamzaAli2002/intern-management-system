@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive.dart';
 
 class AddInternScreen extends StatefulWidget {
   const AddInternScreen({super.key});
@@ -25,7 +26,13 @@ class _AddInternScreenState extends State<AddInternScreen> {
   bool _obscurePass = true;
 
   final _departments = [
-    'Flutter', 'React', 'Python', 'AI/ML', 'Backend', 'UI/UX', 'Full Stack'
+    'Flutter',
+    'React',
+    'Python',
+    'AI/ML',
+    'Backend',
+    'UI/UX',
+    'Full Stack'
   ];
 
   @override
@@ -64,10 +71,12 @@ class _AddInternScreenState extends State<AddInternScreen> {
         context: context,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
-              Icon(Icons.check_circle_rounded, color: AppTheme.accent, size: 28),
+              Icon(Icons.check_circle_rounded,
+                  color: AppTheme.accent, size: 28),
               SizedBox(width: 10),
               Text('Intern Registered!'),
             ],
@@ -114,7 +123,8 @@ class _AddInternScreenState extends State<AddInternScreen> {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Row(
             children: [
               Icon(Icons.error_outline_rounded, color: Colors.red, size: 26),
@@ -156,123 +166,154 @@ class _AddInternScreenState extends State<AddInternScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveHelper.isMobile(context);
+    final padding = ResponsiveHelper.paddingSymmetric(
+      context,
+      mobileH: 16,
+      mobileV: 20,
+      tabletH: 24,
+      desktopH: 32,
+    );
+    final gapSize = isMobile ? 12.0 : 16.0;
+
     return Scaffold(
       backgroundColor: AppTheme.surface,
-      appBar: AppBar(title: const Text('Add New Intern')),
+      appBar: AppBar(
+        title: ResponsiveText(
+          'Add New Intern',
+          mobileSize: 16,
+          tabletSize: 18,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _sectionHeader('Personal Information', Icons.person_outline_rounded),
-              const SizedBox(height: 14),
-              _field(
-                controller: _nameCtrl,
-                label: 'Full Name',
-                icon: Icons.badge_outlined,
-                validator: (v) =>
-                    v?.isEmpty == true ? 'Full name is required' : null,
-              ),
-              const SizedBox(height: 14),
-              _field(
-                controller: _emailCtrl,
-                label: 'Email Address',
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  if (v?.isEmpty == true) return 'Email is required';
-                  if (!v!.contains('@')) return 'Enter a valid email';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 14),
-              _field(
-                controller: _phoneCtrl,
-                label: 'Phone Number',
-                icon: Icons.phone_outlined,
-                keyboardType: TextInputType.phone,
-                validator: (v) =>
-                    v?.isEmpty == true ? 'Phone number is required' : null,
-              ),
-              const SizedBox(height: 24),
-              _sectionHeader('Internship Details', Icons.work_outline_rounded),
-              const SizedBox(height: 14),
-              DropdownButtonFormField<String>(
-                value: _selectedDept,
-                decoration: const InputDecoration(
-                  labelText: 'Department / Track',
-                  prefixIcon: Icon(Icons.category_outlined, color: AppTheme.accent),
+          padding: padding,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveHelper.maxContentWidth(context),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionHeader(
+                    'Personal Information', Icons.person_outline_rounded),
+                SizedBox(height: gapSize),
+                _field(
+                  controller: _nameCtrl,
+                  label: 'Full Name',
+                  icon: Icons.badge_outlined,
+                  validator: (v) =>
+                      v?.isEmpty == true ? 'Full name is required' : null,
                 ),
-                items: _departments
-                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                    .toList(),
-                onChanged: (v) => setState(() => _selectedDept = v!),
-              ),
-              const SizedBox(height: 14),
-              _field(
-                controller: _batchCtrl,
-                label: 'Batch No. (e.g. Batch-12)',
-                icon: Icons.group_outlined,
-                validator: (v) =>
-                    v?.isEmpty == true ? 'Batch number is required' : null,
-              ),
-              const SizedBox(height: 24),
-              _sectionHeader('Login Credentials', Icons.security_outlined),
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: _passCtrl,
-                obscureText: _obscurePass,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon:
-                      const Icon(Icons.lock_outline, color: AppTheme.accent),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePass
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      color: AppTheme.textLight,
+                SizedBox(height: gapSize),
+                _field(
+                  controller: _emailCtrl,
+                  label: 'Email Address',
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v?.isEmpty == true) return 'Email is required';
+                    if (!v!.contains('@')) return 'Enter a valid email';
+                    return null;
+                  },
+                ),
+                SizedBox(height: gapSize),
+                _field(
+                  controller: _phoneCtrl,
+                  label: 'Phone Number',
+                  icon: Icons.phone_outlined,
+                  keyboardType: TextInputType.phone,
+                  validator: (v) =>
+                      v?.isEmpty == true ? 'Phone number is required' : null,
+                ),
+                SizedBox(height: gapSize * 1.5),
+                _sectionHeader(
+                    'Internship Details', Icons.work_outline_rounded),
+                SizedBox(height: gapSize),
+                DropdownButtonFormField<String>(
+                  value: _selectedDept,
+                  decoration: const InputDecoration(
+                    labelText: 'Department / Track',
+                    prefixIcon:
+                        Icon(Icons.category_outlined, color: AppTheme.accent),
+                  ),
+                  items: _departments
+                      .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedDept = v!),
+                ),
+                SizedBox(height: gapSize),
+                _field(
+                  controller: _batchCtrl,
+                  label: 'Batch No. (e.g. Batch-12)',
+                  icon: Icons.group_outlined,
+                  validator: (v) =>
+                      v?.isEmpty == true ? 'Batch number is required' : null,
+                ),
+                SizedBox(height: gapSize * 1.5),
+                _sectionHeader('Login Credentials', Icons.security_outlined),
+                SizedBox(height: gapSize),
+                TextFormField(
+                  controller: _passCtrl,
+                  obscureText: _obscurePass,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon:
+                        const Icon(Icons.lock_outline, color: AppTheme.accent),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePass
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppTheme.textLight,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePass = !_obscurePass),
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePass = !_obscurePass),
+                  ),
+                  validator: (v) {
+                    if (v?.isEmpty == true) return 'Password is required';
+                    if (v!.length < 6) return 'Minimum 6 characters';
+                    return null;
+                  },
+                ),
+                SizedBox(height: gapSize * 0.4),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ResponsiveText(
+                    '🔐 Share these credentials with the intern so they can log in.',
+                    mobileSize: 11,
+                    tabletSize: 12,
+                    style: const TextStyle(color: AppTheme.textMid),
                   ),
                 ),
-                validator: (v) {
-                  if (v?.isEmpty == true) return 'Password is required';
-                  if (v!.length < 6) return 'Minimum 6 characters';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(10),
+                SizedBox(height: gapSize * 2),
+                SizedBox(
+                  height: isMobile ? 48 : 52,
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _register,
+                    icon: _isLoading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2))
+                        : const Icon(Icons.person_add_rounded),
+                    label: ResponsiveText(
+                      'Register Intern',
+                      mobileSize: 14,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
                 ),
-                child: const Text(
-                  '🔐 Share these credentials with the intern so they can log in.',
-                  style: TextStyle(fontSize: 12, color: AppTheme.textMid),
-                ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                height: 52,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _register,
-                  icon: _isLoading
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2))
-                      : const Icon(Icons.person_add_rounded),
-                  label: const Text('Register Intern'),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -284,10 +325,11 @@ class _AddInternScreenState extends State<AddInternScreen> {
       children: [
         Icon(icon, color: AppTheme.accent, size: 18),
         const SizedBox(width: 8),
-        Text(
+        ResponsiveText(
           title,
+          mobileSize: 14,
+          tabletSize: 16,
           style: const TextStyle(
-            fontSize: 15,
             fontWeight: FontWeight.w600,
             color: AppTheme.textDark,
           ),

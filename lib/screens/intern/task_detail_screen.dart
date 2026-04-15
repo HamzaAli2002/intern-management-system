@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../main.dart';
 import '../../models/task_model.dart';
 import '../../services/firestore_service.dart';
+import '../../utils/responsive.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final String taskId;
@@ -153,9 +154,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sw = MediaQuery.of(context).size.width;
-    final isTablet = sw >= 600;
-    final hPad = isTablet ? sw * 0.1 : 16.0;
+    final isMobile = ResponsiveHelper.isMobile(context);
+    final hPad = ResponsiveHelper.paddingSymmetric(
+      context,
+      mobileH: 16,
+      mobileV: 20,
+      tabletH: 24,
+      desktopH: 32,
+    ).horizontal;
 
     return StreamBuilder<TaskModel?>(
       stream: _db.streamTask(widget.taskId),
@@ -177,21 +183,32 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         return Scaffold(
           backgroundColor: AppTheme.surface,
           appBar: AppBar(
-            title: const Text('Task Details'),
+            title: ResponsiveText(
+              'Task Details',
+              mobileSize: 16,
+              tabletSize: 18,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             actions: [
               if (canEdit && !_isEditing)
                 TextButton.icon(
                   onPressed: () => setState(() => _isEditing = true),
                   icon: const Icon(Icons.edit_rounded,
                       color: Colors.white, size: 18),
-                  label:
-                      const Text('Edit', style: TextStyle(color: Colors.white)),
+                  label: ResponsiveText(
+                    'Edit',
+                    mobileSize: 13,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               if (_isEditing)
                 TextButton(
                   onPressed: () => setState(() => _isEditing = false),
-                  child: const Text('Cancel',
-                      style: TextStyle(color: Colors.white70)),
+                  child: ResponsiveText(
+                    'Cancel',
+                    mobileSize: 13,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                 ),
             ],
           ),
@@ -209,21 +226,27 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 const SizedBox(height: 18),
 
                 // Title
-                Text(task.title,
-                    style: TextStyle(
-                        fontSize: isTablet ? 24 : 20,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textDark)),
+                ResponsiveText(
+                  task.title,
+                  mobileSize: 18,
+                  tabletSize: 22,
+                  desktopSize: 24,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textDark,
+                  ),
+                ),
                 const SizedBox(height: 12),
 
                 // Description
                 _card(
-                    child: Text(task.description,
-                        style: const TextStyle(
-                            color: AppTheme.textMid,
-                            fontSize: 14,
-                            height: 1.65))),
-                const SizedBox(height: 14),
+                    child: ResponsiveText(
+                  task.description,
+                  mobileSize: 13,
+                  tabletSize: 14,
+                  style: const TextStyle(color: AppTheme.textMid, height: 1.65),
+                )),
+                SizedBox(height: isMobile ? 12 : 14),
 
                 // Dates
                 _card(
@@ -231,17 +254,17 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   _infoRow(Icons.calendar_today_outlined, 'Due Date',
                       df.format(task.dueDate),
                       color: task.isOverdue ? Colors.red : AppTheme.textDark),
-                  const Divider(height: 18),
+                  Divider(height: isMobile ? 16 : 18),
                   _infoRow(Icons.add_task_rounded, 'Assigned',
                       df.format(task.createdAt)),
                   if (task.submittedAt != null) ...[
-                    const Divider(height: 18),
+                    Divider(height: isMobile ? 16 : 18),
                     _infoRow(Icons.upload_rounded, 'Submitted',
                         df.format(task.submittedAt!),
                         color: const Color(0xFF3B82F6)),
                   ],
                   if (task.completedAt != null) ...[
-                    const Divider(height: 18),
+                    Divider(height: isMobile ? 16 : 18),
                     _infoRow(Icons.check_circle_outline_rounded, 'Approved',
                         df.format(task.completedAt!),
                         color: AppTheme.accent),
@@ -249,22 +272,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 ])),
 
                 if (task.isOverdue) ...[
-                  const SizedBox(height: 12),
+                  SizedBox(height: isMobile ? 10 : 12),
                   _banner('This task is overdue!', Colors.red,
                       icon: Icons.warning_amber_rounded),
                 ],
 
                 // Admin remark
                 if (task.hasReview) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: isMobile ? 16 : 20),
                   _remarkCard(task),
                 ],
 
                 // Submitted links (read-only when not editing)
                 if (task.links.isNotEmpty && !_isEditing) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: isMobile ? 16 : 20),
                   _sectionLabel('Submitted Links'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: isMobile ? 8 : 10),
                   ...task.links.map((l) => _linkTile(l)),
                 ],
 
@@ -272,59 +295,72 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 if (task.submissionNote != null &&
                     task.submissionNote!.isNotEmpty &&
                     !_isEditing) ...[
-                  const SizedBox(height: 16),
+                  SizedBox(height: isMobile ? 12 : 16),
                   _sectionLabel('Submission Note'),
-                  const SizedBox(height: 8),
+                  SizedBox(height: isMobile ? 6 : 8),
                   _card(
-                      child: Text(task.submissionNote!,
-                          style: const TextStyle(
-                              color: AppTheme.textMid,
-                              fontSize: 14,
-                              height: 1.55))),
+                      child: ResponsiveText(
+                    task.submissionNote!,
+                    mobileSize: 13,
+                    tabletSize: 14,
+                    style:
+                        const TextStyle(color: AppTheme.textMid, height: 1.55),
+                  )),
                 ],
 
                 // Submission form
                 if (_isEditing || canSubmit) ...[
-                  const SizedBox(height: 24),
+                  SizedBox(height: isMobile ? 20 : 24),
                   _sectionLabel(_isEditing ? 'Edit Submission' : 'Submit Task'),
-                  const SizedBox(height: 4),
-                  const Text('Add your GitHub repo and/or LinkedIn post link',
-                      style:
-                          TextStyle(color: AppTheme.textLight, fontSize: 12)),
-                  const SizedBox(height: 14),
+                  SizedBox(height: isMobile ? 3 : 4),
+                  ResponsiveText(
+                    'Add your GitHub repo and/or LinkedIn post link',
+                    mobileSize: 11,
+                    tabletSize: 12,
+                    style: const TextStyle(color: AppTheme.textLight),
+                  ),
+                  SizedBox(height: isMobile ? 12 : 14),
                   _linkField(
                       controller: _githubCtrl,
                       label: 'GitHub Repository URL',
                       hint: 'https://github.com/username/repo-name',
                       icon: Icons.code_rounded,
                       color: const Color(0xFF24292F)),
-                  const SizedBox(height: 12),
+                  SizedBox(height: isMobile ? 10 : 12),
                   _linkField(
                       controller: _linkedinCtrl,
                       label: 'LinkedIn Post URL',
                       hint: 'https://linkedin.com/posts/your-post-id',
                       icon: Icons.work_outline_rounded,
                       color: const Color(0xFF0A66C2)),
-                  const SizedBox(height: 12),
+                  SizedBox(height: isMobile ? 10 : 12),
                   _linkField(
                       controller: _otherLinkCtrl,
                       label: 'Other Link (optional)',
                       hint: 'https://example.com/demo',
                       icon: Icons.link_rounded,
                       color: const Color(0xFF8B5CF6)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: isMobile ? 6 : 8),
                   TextField(
                     controller: _otherLabelCtrl,
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.fontSize(context,
+                          mobileSize: 13, tabletSize: 14),
+                    ),
                     decoration: _inputDec(
                         'Label for other link',
                         'e.g. Live Demo, Figma, Drive',
                         Icons.label_outline_rounded,
                         AppTheme.textLight),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: isMobile ? 10 : 12),
                   TextField(
                     controller: _noteCtrl,
-                    maxLines: 4,
+                    maxLines: isMobile ? 3 : 4,
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.fontSize(context,
+                          mobileSize: 13, tabletSize: 14),
+                    ),
                     decoration: _inputDec(
                         'Description / Notes',
                         'What did you build? What challenges did you face? What did you learn?',
@@ -332,39 +368,44 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         AppTheme.textLight,
                         alignHint: true),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: isMobile ? 8 : 10),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(isMobile ? 10 : 12),
                     decoration: BoxDecoration(
                       color: AppTheme.accent.withOpacity(0.07),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Row(
+                    child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(Icons.lightbulb_outline_rounded,
-                              color: AppTheme.accent, size: 16),
-                          SizedBox(width: 8),
+                              color: AppTheme.accent, size: isMobile ? 15 : 16),
+                          SizedBox(width: isMobile ? 6 : 8),
                           Expanded(
-                            child: Text(
+                            child: ResponsiveText(
                               'Tip: Push code to GitHub → Post on LinkedIn → Paste both links here.',
-                              style: TextStyle(
-                                  color: AppTheme.textMid,
-                                  fontSize: 12,
-                                  height: 1.4),
+                              mobileSize: 11,
+                              tabletSize: 12,
+                              style: const TextStyle(
+                                  color: AppTheme.textMid, height: 1.4),
                             ),
                           ),
                         ]),
                   ),
                 ],
 
-                const SizedBox(height: 24),
+                SizedBox(height: isMobile ? 20 : 24),
 
                 // Action buttons
                 if (task.status == 'pending') ...[
-                  _actionBtn('Start Task', Icons.play_arrow_rounded,
-                      const Color(0xFF3B82F6), true, () => _startTask(task.id)),
-                  const SizedBox(height: 10),
+                  _actionBtn(
+                      'Start Task',
+                      Icons.play_arrow_rounded,
+                      const Color(0xFF3B82F6),
+                      true,
+                      () => _startTask(task.id),
+                      isMobile),
+                  SizedBox(height: isMobile ? 8 : 10),
                 ],
                 if (canSubmit)
                   _actionBtn(
@@ -377,6 +418,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     AppTheme.accent,
                     false,
                     _isSubmitting ? null : () => _submitTask(task),
+                    isMobile,
                     loading: _isSubmitting,
                   ),
                 if (isSubmitted)
@@ -574,24 +616,28 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   }
 
   Widget _actionBtn(String label, IconData icon, Color color, bool outlined,
-      VoidCallback? onPressed,
+      VoidCallback? onPressed, bool isMobile,
       {bool loading = false}) {
     final content = Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       if (loading)
-        const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
+        SizedBox(
+            width: isMobile ? 16 : 18,
+            height: isMobile ? 16 : 18,
+            child: const CircularProgressIndicator(
                 color: Colors.white, strokeWidth: 2.5))
       else
-        Icon(icon, size: 19),
-      const SizedBox(width: 8),
-      Text(label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+        Icon(icon, size: isMobile ? 17 : 19),
+      SizedBox(width: isMobile ? 6 : 8),
+      ResponsiveText(
+        label,
+        mobileSize: 14,
+        tabletSize: 15,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
     ]);
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: isMobile ? 48 : 52,
       child: outlined
           ? OutlinedButton(
               onPressed: onPressed,

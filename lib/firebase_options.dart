@@ -14,9 +14,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'No Web Firebase options configured. Run: flutterfire configure',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -32,6 +30,14 @@ class DefaultFirebaseOptions {
 
   // ⚠️ REPLACE THESE WITH YOUR ACTUAL FIREBASE CONFIG VALUES
 
+  static const FirebaseOptions web = FirebaseOptions(
+      apiKey: "AIzaSyCyPRpN9tf3PAO_spi11xW_OCQ4CbodOns",
+      authDomain: "internee-pk-ims.firebaseapp.com",
+      projectId: "internee-pk-ims",
+      storageBucket: "internee-pk-ims.firebasestorage.app",
+      messagingSenderId: "519520193791",
+      appId: "1:519520193791:web:86b1fc17a73fa9524e10ca");
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDtGD-uPf6BvvejbUl9x__A7uk9Zu2gQ3o',
     appId: '1:519520193791:android:76b1e9a549a6ffe54e10ca',
@@ -43,11 +49,11 @@ class DefaultFirebaseOptions {
   // Get them from: Firebase Console → Project Settings → Your Apps
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
+    apiKey: 'AIzaSyDtGD-uPf6BvvejbUl9x__A7uk9Zu2gQ3o',
+    appId: '1:519520193791:ios:81bdb2d2b8bf0f234e10ca',
+    messagingSenderId: '519520193791',
+    projectId: 'internee-pk-ims',
+    storageBucket: 'internee-pk-ims.firebasestorage.app',
     iosBundleId: 'com.example.internManagement',
   );
 }

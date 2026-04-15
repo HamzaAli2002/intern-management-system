@@ -24,8 +24,31 @@ class _InternDashboardState extends State<InternDashboard> {
   final _db = FirestoreService();
   int _selectedTab = 0;
 
+  List<TaskModel> _filterTasks(List<TaskModel> tasks, int tab) {
+    switch (tab) {
+      case 1: return tasks.where((t) => t.status == 'pending').toList();
+      case 2: return tasks.where((t) => t.status == 'in_progress').toList();
+      case 3: return tasks.where((t) => t.status == 'submitted').toList();
+      case 4: return tasks.where((t) => t.status == 'completed' || t.adminReviewStatus == 'approved').toList();
+      default: return tasks;
+    }
+  }
+
+  Color _statusColor(String? s) {
+    switch (s) {
+      case 'active': return AppTheme.accent;
+      case 'completed': return const Color(0xFF3B82F6);
+      case 'inactive': return Colors.orange;
+      default: return AppTheme.accent;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final isTablet = sw >= 600;
+    final hPad = isTablet ? (sw * 0.08).clamp(0.0, 120.0) : 16.0;
+
     return StreamBuilder<InternUser?>(
       stream: _db.streamInternById(widget.uid),
       builder: (context, userSnap) {
@@ -35,94 +58,84 @@ class _InternDashboardState extends State<InternDashboard> {
           appBar: AppBar(
             backgroundColor: AppTheme.primary,
             title: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('My Dashboard',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 if (intern != null)
-                  Text(
-                    intern.name,
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white.withOpacity(0.7),
-                        fontWeight: FontWeight.w400),
-                  ),
+                  Text(intern.name,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white.withOpacity(0.65),
+                          fontWeight: FontWeight.w400)),
               ],
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.logout_rounded),
-                onPressed: _confirmLogout,
-                tooltip: 'Logout',
-              ),
+                  icon: const Icon(Icons.logout_rounded),
+                  onPressed: _confirmLogout)
             ],
           ),
           body: StreamBuilder<List<TaskModel>>(
             stream: _db.getTasksForIntern(widget.uid),
             builder: (context, taskSnap) {
-              final allTasks = taskSnap.data ?? [];
-              final tabs = ['All', 'Pending', 'In Progress', 'Submitted', 'Completed'];
-              final filtered = _filterTasks(allTasks, _selectedTab);
-              final sw = MediaQuery.of(context).size.width;
-              final isTablet = sw >= 600;
-              final hPad = isTablet ? sw * 0.08 : 0.0;
+              // Show loading only on very first load with no data
+              if (taskSnap.connectionState == ConnectionState.waiting &&
+                  !taskSnap.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-              return CustomScrollView(
-                slivers: [
+              final allTasks = taskSnap.data ?? [];
+              final tabs = ['All', 'Pending', 'Active', 'Submitted', 'Done'];
+              final filtered = _filterTasks(allTasks, _selectedTab);
+
+              return ListView(
+                padding: EdgeInsets.zero,
+                children: [
                   // ── Profile Header ──
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: hPad),
-                      child: _buildProfileHeader(intern, allTasks),
-                    ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: hPad, vertical: 0),
+                    child: _buildProfileHeader(intern, allTasks, sw),
                   ),
 
-                  // ── Stat Cards ──
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: hPad),
-                      child: _buildStatRow(allTasks),
-                    ),
+                  // ── Stat Row ──
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 12),
+                    child: _buildStatRow(allTasks, sw),
                   ),
 
                   // ── Filter Tabs ──
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: hPad),
-                      child: _buildFilterTabs(tabs),
-                    ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 12),
+                    child: _buildFilterTabs(tabs),
                   ),
 
-                  // ── Tasks ──
+                  // ── Task List or Empty ──
                   if (filtered.isEmpty)
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: _buildEmptyState(),
-                    )
+                    _buildEmptyState()
                   else
-                    SliverPadding(
-                      padding: EdgeInsets.fromLTRB(
-                          16 + hPad, 0, 16 + hPad, 24),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (ctx, i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: TaskCard(
-                              task: filtered[i],
-                              isIntern: true,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => TaskDetailScreen(
-                                    taskId: filtered[i].id,
-                                    internUid: widget.uid,
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 32),
+                      child: Column(
+                        children: filtered
+                            .map((task) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: TaskCard(
+                                    task: task,
+                                    isIntern: true,
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => TaskDetailScreen(
+                                          taskId: task.id,
+                                          internUid: widget.uid,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          childCount: filtered.length,
-                        ),
+                                ))
+                            .toList(),
                       ),
                     ),
                 ],
@@ -134,29 +147,11 @@ class _InternDashboardState extends State<InternDashboard> {
     );
   }
 
-  List<TaskModel> _filterTasks(List<TaskModel> tasks, int tab) {
-    switch (tab) {
-      case 1:
-        return tasks.where((t) => t.status == 'pending').toList();
-      case 2:
-        return tasks.where((t) => t.status == 'in_progress').toList();
-      case 3:
-        return tasks.where((t) => t.status == 'submitted').toList();
-      case 4:
-        return tasks
-            .where((t) =>
-                t.status == 'completed' ||
-                t.adminReviewStatus == 'approved')
-            .toList();
-      default:
-        return tasks;
-    }
-  }
-
-  Widget _buildProfileHeader(InternUser? intern, List<TaskModel> tasks) {
+  Widget _buildProfileHeader(InternUser? intern, List<TaskModel> tasks, double sw) {
+    final isSmall = sw < 380;
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.fromLTRB(0, 16, 0, 12),
+      padding: EdgeInsets.all(isSmall ? 14 : 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppTheme.primary, Color(0xFF1A3A5C)],
@@ -166,51 +161,46 @@ class _InternDashboardState extends State<InternDashboard> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
+              color: AppTheme.primary.withOpacity(0.3),
+              blurRadius: 18,
+              offset: const Offset(0, 6)),
         ],
       ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 32,
+            radius: isSmall ? 26 : 32,
             backgroundColor: AppTheme.accent.withOpacity(0.2),
             child: Text(
-              intern?.name.isNotEmpty == true
-                  ? intern!.name[0].toUpperCase()
-                  : '?',
-              style: const TextStyle(
-                color: AppTheme.accent,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
+              intern?.name.isNotEmpty == true ? intern!.name[0].toUpperCase() : '?',
+              style: TextStyle(
+                  color: AppTheme.accent,
+                  fontSize: isSmall ? 20 : 24,
+                  fontWeight: FontWeight.w700),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   intern?.name ?? 'Loading...',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isSmall ? 15 : 17,
+                      fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   intern?.department ?? '',
                   style: TextStyle(
-                      color: Colors.white.withOpacity(0.65), fontSize: 13),
+                      color: Colors.white.withOpacity(0.6), fontSize: 12),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: _statusColor(intern?.status).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -218,11 +208,10 @@ class _InternDashboardState extends State<InternDashboard> {
                   child: Text(
                     (intern?.status ?? 'active').toUpperCase(),
                     style: TextStyle(
-                      color: _statusColor(intern?.status),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.8,
-                    ),
+                        color: _statusColor(intern?.status),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5),
                   ),
                 ),
               ],
@@ -230,118 +219,90 @@ class _InternDashboardState extends State<InternDashboard> {
           ),
           ProgressRing(
             progress: intern?.progressPercent ?? 0,
-            size: 64,
+            size: isSmall ? 52 : 62,
             color: AppTheme.accent,
-            label:
-                '${((intern?.progressPercent ?? 0) * 100).toStringAsFixed(0)}%',
+            label: '${((intern?.progressPercent ?? 0) * 100).toStringAsFixed(0)}%',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatRow(List<TaskModel> tasks) {
+  Widget _buildStatRow(List<TaskModel> tasks, double sw) {
     final pending = tasks.where((t) => t.status == 'pending').length;
     final inProgress = tasks.where((t) => t.status == 'in_progress').length;
     final submitted = tasks.where((t) => t.status == 'submitted').length;
     final completed = tasks.where((t) => t.status == 'completed').length;
+    final isSmall = sw < 380;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      child: Row(
-        children: [
-          _statChip('Pending', pending, const Color(0xFFFF6E40),
-              Icons.hourglass_empty_rounded),
-          const SizedBox(width: 8),
-          _statChip('Active', inProgress, const Color(0xFF3B82F6),
-              Icons.autorenew_rounded),
-          const SizedBox(width: 8),
-          _statChip('Submitted', submitted, const Color(0xFF8B5CF6),
-              Icons.upload_rounded),
-          const SizedBox(width: 8),
-          _statChip('Done', completed, AppTheme.accent,
-              Icons.check_circle_outline_rounded),
-        ],
-      ),
-    );
+    return Row(children: [
+      _statChip('Pending', pending, const Color(0xFFFF6E40),
+          Icons.hourglass_empty_rounded, isSmall),
+      const SizedBox(width: 6),
+      _statChip('Active', inProgress, const Color(0xFF3B82F6),
+          Icons.autorenew_rounded, isSmall),
+      const SizedBox(width: 6),
+      _statChip('Sent', submitted, const Color(0xFF8B5CF6),
+          Icons.upload_rounded, isSmall),
+      const SizedBox(width: 6),
+      _statChip('Done', completed, AppTheme.accent,
+          Icons.check_circle_outline_rounded, isSmall),
+    ]);
   }
 
-  Widget _statChip(String label, int count, Color color, IconData icon) {
+  Widget _statChip(String label, int count, Color color, IconData icon, bool small) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        padding: EdgeInsets.symmetric(vertical: small ? 10 : 12, horizontal: 4),
         decoration: BoxDecoration(
           color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withOpacity(0.2)),
         ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 6),
-            Text(
-              '$count',
+        child: Column(children: [
+          Icon(icon, color: color, size: small ? 18 : 20),
+          const SizedBox(height: 4),
+          Text('$count',
               style: TextStyle(
-                color: color,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            Text(
-              label,
+                  color: color,
+                  fontSize: small ? 16 : 18,
+                  fontWeight: FontWeight.w700)),
+          Text(label,
               style: TextStyle(
-                color: color.withOpacity(0.8),
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+                  color: color.withOpacity(0.8),
+                  fontSize: small ? 9 : 10,
+                  fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center),
+        ]),
       ),
     );
   }
 
   Widget _buildFilterTabs(List<String> tabs) {
-    return Container(
-      height: 44,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+    return SizedBox(
+      height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: tabs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
         itemBuilder: (_, i) {
           final selected = _selectedTab == i;
           return GestureDetector(
             onTap: () => setState(() => _selectedTab = i),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: selected ? AppTheme.primary : Colors.white,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: selected
-                        ? AppTheme.primary
-                        : const Color(0xFFE2E8F0)),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: AppTheme.primary.withOpacity(0.25),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        )
-                      ]
-                    : [],
+                    color: selected ? AppTheme.primary : const Color(0xFFE2E8F0)),
               ),
-              child: Text(
-                tabs[i],
-                style: TextStyle(
-                  color: selected ? Colors.white : AppTheme.textMid,
-                  fontWeight:
-                      selected ? FontWeight.w600 : FontWeight.w400,
-                  fontSize: 13,
-                ),
-              ),
+              child: Text(tabs[i],
+                  style: TextStyle(
+                      color: selected ? Colors.white : AppTheme.textMid,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                      fontSize: 12)),
             ),
           );
         },
@@ -350,41 +311,28 @@ class _InternDashboardState extends State<InternDashboard> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.task_alt_rounded,
-              size: 64, color: AppTheme.textLight.withOpacity(0.5)),
-          const SizedBox(height: 16),
-          const Text(
-            'No tasks here',
-            style: TextStyle(
-                color: AppTheme.textMid,
-                fontSize: 16,
-                fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Tasks assigned by admin will appear here.',
-            style: TextStyle(color: AppTheme.textLight, fontSize: 13),
-          ),
-        ],
+    return SizedBox(
+      height: 280,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.task_alt_rounded,
+                size: 56, color: AppTheme.textLight.withOpacity(0.4)),
+            const SizedBox(height: 14),
+            const Text('No tasks here',
+                style: TextStyle(
+                    color: AppTheme.textMid,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500)),
+            const SizedBox(height: 6),
+            const Text('Tasks assigned by admin will appear here.',
+                style: TextStyle(color: AppTheme.textLight, fontSize: 12),
+                textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
-  }
-
-  Color _statusColor(String? status) {
-    switch (status) {
-      case 'active':
-        return AppTheme.accent;
-      case 'completed':
-        return const Color(0xFF3B82F6);
-      case 'inactive':
-        return Colors.orange;
-      default:
-        return AppTheme.accent;
-    }
   }
 
   Future<void> _confirmLogout() async {
@@ -400,8 +348,7 @@ class _InternDashboardState extends State<InternDashboard> {
               child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style:
-                ElevatedButton.styleFrom(backgroundColor: AppTheme.accentOrange),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentOrange),
             child: const Text('Sign Out'),
           ),
         ],

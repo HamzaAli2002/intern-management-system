@@ -54,14 +54,14 @@ class Responsive {
 // ── App Theme ──────────────────────────────────────────────────────────────
 class AppTheme {
   // Brand: Internee.pk navy + teal
-  static const Color primary = Color(0xFF0D1B2A);
-  static const Color accent = Color(0xFF00BFA6);
+  static const Color primary      = Color(0xFF0D1B2A);
+  static const Color accent       = Color(0xFF00BFA6);
   static const Color accentOrange = Color(0xFFFF6E40);
-  static const Color surface = Color(0xFFF4F7FB);
-  static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color textDark = Color(0xFF0D1B2A);
-  static const Color textMid = Color(0xFF4A5568);
-  static const Color textLight = Color(0xFF9AA5B4);
+  static const Color surface      = Color(0xFFF4F7FB);
+  static const Color cardBg       = Color(0xFFFFFFFF);
+  static const Color textDark     = Color(0xFF0D1B2A);
+  static const Color textMid      = Color(0xFF4A5568);
+  static const Color textLight    = Color(0xFF9AA5B4);
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -72,7 +72,7 @@ class AppTheme {
       surface: surface,
     ),
     scaffoldBackgroundColor: surface,
-    fontFamily: 'Roboto',
+    // No custom fontFamily — avoids blank screen on web from missing font assets
     appBarTheme: const AppBarTheme(
       backgroundColor: primary,
       foregroundColor: Colors.white,
@@ -119,8 +119,10 @@ class AppTheme {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.red),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-      labelStyle: const TextStyle(color: textMid, fontSize: 14),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      labelStyle:
+          const TextStyle(color: textMid, fontSize: 14),
     ),
     cardTheme: CardThemeData(
       color: cardBg,
@@ -133,3 +135,4 @@ class AppTheme {
     ),
   );
 }
+

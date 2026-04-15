@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../main.dart';
 import '../../models/task_model.dart';
 import '../../services/firestore_service.dart';
+import '../../utils/responsive.dart';
 
 class TaskReviewScreen extends StatefulWidget {
   final String taskId;
@@ -57,9 +58,15 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sw = MediaQuery.of(context).size.width;
-    final isTablet = sw > 600;
-    final hPad = isTablet ? sw * 0.1 : 16.0;
+    final isMobile = ResponsiveHelper.isMobile(context);
+    final gapSize = isMobile ? 12.0 : 16.0;
+    final hPad = ResponsiveHelper.paddingSymmetric(
+      context,
+      mobileH: 16,
+      mobileV: 0,
+      tabletH: 24,
+      desktopH: 32,
+    ).horizontal;
     final df = DateFormat('MMM dd, yyyy • hh:mm a');
 
     return StreamBuilder<TaskModel?>(
@@ -77,7 +84,12 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
         return Scaffold(
           backgroundColor: AppTheme.surface,
           appBar: AppBar(
-            title: const Text('Review Submission'),
+            title: ResponsiveText(
+              'Review Submission',
+              mobileSize: 16,
+              tabletSize: 18,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             actions: [
               if (alreadyReviewed)
                 Container(
@@ -88,11 +100,12 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text('Reviewed',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500)),
+                  child: ResponsiveText(
+                    'Reviewed',
+                    mobileSize: 11,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
                 ),
             ],
           ),
@@ -223,27 +236,41 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
                 // ── Review Form ──
                 if (task.status == 'submitted') ...[
                   _sectionLabel('✍️  Your Review'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: gapSize),
 
                   // Review status selector
-                  Row(
+                  Wrap(
+                    spacing: gapSize,
+                    runSpacing: gapSize,
                     children: [
-                      _reviewOption('approved', '✅ Approve', AppTheme.accent),
-                      const SizedBox(width: 8),
-                      _reviewOption(
-                          'needs_revision', '🔄 Revise', Colors.orange),
-                      const SizedBox(width: 8),
-                      _reviewOption('rejected', '❌ Reject', Colors.red),
+                      Expanded(
+                          child: _reviewOption(
+                              'approved', '✅ Approve', AppTheme.accent)),
+                      Expanded(
+                          child: _reviewOption(
+                              'needs_revision', '🔄 Revise', Colors.orange)),
+                      Expanded(
+                          child: _reviewOption(
+                              'rejected', '❌ Reject', Colors.red)),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: gapSize * 1.5),
 
                   // Remark text field
                   TextField(
                     controller: _remarkCtrl,
-                    maxLines: 5,
+                    maxLines: isMobile ? 4 : 5,
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.fontSize(context,
+                          mobileSize: 13, tabletSize: 14),
+                      color: AppTheme.textDark,
+                    ),
                     decoration: InputDecoration(
                       hintText: _remarkHint(_reviewStatus),
+                      hintStyle: TextStyle(
+                        fontSize: ResponsiveHelper.fontSize(context,
+                            mobileSize: 12, tabletSize: 13),
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -258,14 +285,20 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
                               color: AppTheme.accent, width: 2)),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveHelper.paddingSymmetric(context,
+                                mobileH: 14, mobileV: 0, tabletH: 16)
+                            .horizontal,
+                        vertical: 12,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: gapSize * 2),
 
                   // Submit Review Button
                   SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: isMobile ? 48 : 52,
                     child: ElevatedButton.icon(
                       onPressed:
                           _isSubmitting ? null : () => _submitReview(task),
@@ -276,10 +309,11 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
                               child: CircularProgressIndicator(
                                   color: Colors.white, strokeWidth: 2.5))
                           : Icon(_reviewIcon(_reviewStatus)),
-                      label: Text(
+                      label: ResponsiveText(
                         _isSubmitting ? 'Submitting…' : 'Submit Review',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 15),
+                        mobileSize: 14,
+                        tabletSize: 15,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _reviewColor(_reviewStatus),
@@ -291,16 +325,22 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
                   ),
                 ] else if (!alreadyReviewed) ...[
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveHelper.paddingSymmetric(context,
+                              mobileH: 16, mobileV: 0, tabletH: 20)
+                          .horizontal,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.textLight.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Center(
-                      child: Text(
+                    child: Center(
+                      child: ResponsiveText(
                         'Waiting for intern to submit this task.',
-                        style:
-                            TextStyle(color: AppTheme.textLight, fontSize: 14),
+                        mobileSize: 13,
+                        tabletSize: 14,
+                        style: const TextStyle(color: AppTheme.textLight),
                       ),
                     ),
                   ),
@@ -317,26 +357,24 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
 
   Widget _reviewOption(String value, String label, Color color) {
     final selected = _reviewStatus == value;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _reviewStatus = value),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          decoration: BoxDecoration(
-            color: selected ? color : color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
-            border:
-                Border.all(color: selected ? color : color.withOpacity(0.3)),
-          ),
-          child: Text(label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: selected ? Colors.white : color,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              )),
+    return GestureDetector(
+      onTap: () => setState(() => _reviewStatus = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        decoration: BoxDecoration(
+          color: selected ? color : color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: selected ? color : color.withOpacity(0.3)),
         ),
+        child: ResponsiveText(label,
+            textAlign: TextAlign.center,
+            mobileSize: 11,
+            tabletSize: 12,
+            style: TextStyle(
+              color: selected ? Colors.white : color,
+              fontWeight: FontWeight.w600,
+            )),
       ),
     );
   }
