@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
-import '../../utils/responsive.dart';
 
 class AddInternScreen extends StatefulWidget {
   const AddInternScreen({super.key});
@@ -166,40 +165,20 @@ class _AddInternScreenState extends State<AddInternScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveHelper.isMobile(context);
-    final padding = ResponsiveHelper.paddingSymmetric(
-      context,
-      mobileH: 16,
-      mobileV: 20,
-      tabletH: 24,
-      desktopH: 32,
-    );
-    final gapSize = isMobile ? 12.0 : 16.0;
-
     return Scaffold(
       backgroundColor: AppTheme.surface,
-      appBar: AppBar(
-        title: ResponsiveText(
-          'Add New Intern',
-          mobileSize: 16,
-          tabletSize: 18,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-      ),
+      appBar: AppBar(title: const Text('Add New Intern')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: padding,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: ResponsiveHelper.maxContentWidth(context),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _sectionHeader(
                     'Personal Information', Icons.person_outline_rounded),
-                SizedBox(height: gapSize),
+                const SizedBox(height: 14),
                 _field(
                   controller: _nameCtrl,
                   label: 'Full Name',
@@ -207,7 +186,7 @@ class _AddInternScreenState extends State<AddInternScreen> {
                   validator: (v) =>
                       v?.isEmpty == true ? 'Full name is required' : null,
                 ),
-                SizedBox(height: gapSize),
+                const SizedBox(height: 14),
                 _field(
                   controller: _emailCtrl,
                   label: 'Email Address',
@@ -219,7 +198,7 @@ class _AddInternScreenState extends State<AddInternScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: gapSize),
+                const SizedBox(height: 14),
                 _field(
                   controller: _phoneCtrl,
                   label: 'Phone Number',
@@ -228,10 +207,10 @@ class _AddInternScreenState extends State<AddInternScreen> {
                   validator: (v) =>
                       v?.isEmpty == true ? 'Phone number is required' : null,
                 ),
-                SizedBox(height: gapSize * 1.5),
+                const SizedBox(height: 24),
                 _sectionHeader(
                     'Internship Details', Icons.work_outline_rounded),
-                SizedBox(height: gapSize),
+                const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
                   value: _selectedDept,
                   decoration: const InputDecoration(
@@ -244,7 +223,7 @@ class _AddInternScreenState extends State<AddInternScreen> {
                       .toList(),
                   onChanged: (v) => setState(() => _selectedDept = v!),
                 ),
-                SizedBox(height: gapSize),
+                const SizedBox(height: 14),
                 _field(
                   controller: _batchCtrl,
                   label: 'Batch No. (e.g. Batch-12)',
@@ -252,9 +231,9 @@ class _AddInternScreenState extends State<AddInternScreen> {
                   validator: (v) =>
                       v?.isEmpty == true ? 'Batch number is required' : null,
                 ),
-                SizedBox(height: gapSize * 1.5),
+                const SizedBox(height: 24),
                 _sectionHeader('Login Credentials', Icons.security_outlined),
-                SizedBox(height: gapSize),
+                const SizedBox(height: 14),
                 TextFormField(
                   controller: _passCtrl,
                   obscureText: _obscurePass,
@@ -279,23 +258,21 @@ class _AddInternScreenState extends State<AddInternScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: gapSize * 0.4),
+                const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: ResponsiveText(
+                  child: const Text(
                     '🔐 Share these credentials with the intern so they can log in.',
-                    mobileSize: 11,
-                    tabletSize: 12,
-                    style: const TextStyle(color: AppTheme.textMid),
+                    style: TextStyle(fontSize: 12, color: AppTheme.textMid),
                   ),
                 ),
-                SizedBox(height: gapSize * 2),
+                const SizedBox(height: 32),
                 SizedBox(
-                  height: isMobile ? 48 : 52,
+                  height: 52,
                   child: ElevatedButton.icon(
                     onPressed: _isLoading ? null : _register,
                     icon: _isLoading
@@ -305,11 +282,7 @@ class _AddInternScreenState extends State<AddInternScreen> {
                             child: CircularProgressIndicator(
                                 color: Colors.white, strokeWidth: 2))
                         : const Icon(Icons.person_add_rounded),
-                    label: ResponsiveText(
-                      'Register Intern',
-                      mobileSize: 14,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    label: const Text('Register Intern'),
                   ),
                 ),
               ],
@@ -325,11 +298,10 @@ class _AddInternScreenState extends State<AddInternScreen> {
       children: [
         Icon(icon, color: AppTheme.accent, size: 18),
         const SizedBox(width: 8),
-        ResponsiveText(
+        Text(
           title,
-          mobileSize: 14,
-          tabletSize: 16,
           style: const TextStyle(
+            fontSize: 15,
             fontWeight: FontWeight.w600,
             color: AppTheme.textDark,
           ),

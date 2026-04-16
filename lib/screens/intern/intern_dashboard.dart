@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../main.dart';
+import '../../utils/responsive.dart';
 import '../../models/intern_user.dart';
 import '../../models/task_model.dart';
 import '../../services/auth_service.dart';
@@ -26,28 +27,38 @@ class _InternDashboardState extends State<InternDashboard> {
 
   List<TaskModel> _filterTasks(List<TaskModel> tasks, int tab) {
     switch (tab) {
-      case 1: return tasks.where((t) => t.status == 'pending').toList();
-      case 2: return tasks.where((t) => t.status == 'in_progress').toList();
-      case 3: return tasks.where((t) => t.status == 'submitted').toList();
-      case 4: return tasks.where((t) => t.status == 'completed' || t.adminReviewStatus == 'approved').toList();
-      default: return tasks;
+      case 1:
+        return tasks.where((t) => t.status == 'pending').toList();
+      case 2:
+        return tasks.where((t) => t.status == 'in_progress').toList();
+      case 3:
+        return tasks.where((t) => t.status == 'submitted').toList();
+      case 4:
+        return tasks
+            .where((t) =>
+                t.status == 'completed' || t.adminReviewStatus == 'approved')
+            .toList();
+      default:
+        return tasks;
     }
   }
 
   Color _statusColor(String? s) {
     switch (s) {
-      case 'active': return AppTheme.accent;
-      case 'completed': return const Color(0xFF3B82F6);
-      case 'inactive': return Colors.orange;
-      default: return AppTheme.accent;
+      case 'active':
+        return AppTheme.accent;
+      case 'completed':
+        return const Color(0xFF3B82F6);
+      case 'inactive':
+        return Colors.orange;
+      default:
+        return AppTheme.accent;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
-    final isTablet = sw >= 600;
-    final hPad = isTablet ? (sw * 0.08).clamp(0.0, 120.0) : 16.0;
 
     return StreamBuilder<InternUser?>(
       stream: _db.streamInternById(widget.uid),
@@ -61,7 +72,8 @@ class _InternDashboardState extends State<InternDashboard> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('My Dashboard',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                    style:
+                        TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 if (intern != null)
                   Text(intern.name,
                       style: TextStyle(
@@ -93,30 +105,33 @@ class _InternDashboardState extends State<InternDashboard> {
                 padding: EdgeInsets.zero,
                 children: [
                   // ── Profile Header ──
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: hPad, vertical: 0),
+                  R.wrap(
+                      child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: _buildProfileHeader(intern, allTasks, sw),
-                  ),
+                  )),
 
                   // ── Stat Row ──
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 12),
+                  R.wrap(
+                      child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                     child: _buildStatRow(allTasks, sw),
-                  ),
+                  )),
 
                   // ── Filter Tabs ──
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 12),
+                  R.wrap(
+                      child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                     child: _buildFilterTabs(tabs),
-                  ),
+                  )),
 
                   // ── Task List or Empty ──
                   if (filtered.isEmpty)
                     _buildEmptyState()
                   else
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 32),
+                    R.wrap(
+                        child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                       child: Column(
                         children: filtered
                             .map((task) => Padding(
@@ -137,7 +152,7 @@ class _InternDashboardState extends State<InternDashboard> {
                                 ))
                             .toList(),
                       ),
-                    ),
+                    )),
                 ],
               );
             },
@@ -147,7 +162,8 @@ class _InternDashboardState extends State<InternDashboard> {
     );
   }
 
-  Widget _buildProfileHeader(InternUser? intern, List<TaskModel> tasks, double sw) {
+  Widget _buildProfileHeader(
+      InternUser? intern, List<TaskModel> tasks, double sw) {
     final isSmall = sw < 380;
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 16, 0, 12),
@@ -172,7 +188,9 @@ class _InternDashboardState extends State<InternDashboard> {
             radius: isSmall ? 26 : 32,
             backgroundColor: AppTheme.accent.withOpacity(0.2),
             child: Text(
-              intern?.name.isNotEmpty == true ? intern!.name[0].toUpperCase() : '?',
+              intern?.name.isNotEmpty == true
+                  ? intern!.name[0].toUpperCase()
+                  : '?',
               style: TextStyle(
                   color: AppTheme.accent,
                   fontSize: isSmall ? 20 : 24,
@@ -200,7 +218,8 @@ class _InternDashboardState extends State<InternDashboard> {
                 ),
                 const SizedBox(height: 5),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: _statusColor(intern?.status).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -221,7 +240,8 @@ class _InternDashboardState extends State<InternDashboard> {
             progress: intern?.progressPercent ?? 0,
             size: isSmall ? 52 : 62,
             color: AppTheme.accent,
-            label: '${((intern?.progressPercent ?? 0) * 100).toStringAsFixed(0)}%',
+            label:
+                '${((intern?.progressPercent ?? 0) * 100).toStringAsFixed(0)}%',
           ),
         ],
       ),
@@ -250,7 +270,8 @@ class _InternDashboardState extends State<InternDashboard> {
     ]);
   }
 
-  Widget _statChip(String label, int count, Color color, IconData icon, bool small) {
+  Widget _statChip(
+      String label, int count, Color color, IconData icon, bool small) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: small ? 10 : 12, horizontal: 4),
@@ -296,7 +317,8 @@ class _InternDashboardState extends State<InternDashboard> {
                 color: selected ? AppTheme.primary : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: selected ? AppTheme.primary : const Color(0xFFE2E8F0)),
+                    color:
+                        selected ? AppTheme.primary : const Color(0xFFE2E8F0)),
               ),
               child: Text(tabs[i],
                   style: TextStyle(
@@ -348,7 +370,8 @@ class _InternDashboardState extends State<InternDashboard> {
               child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentOrange),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.accentOrange),
             child: const Text('Sign Out'),
           ),
         ],

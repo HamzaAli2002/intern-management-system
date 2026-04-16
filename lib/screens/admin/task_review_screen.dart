@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../main.dart';
+import '../../utils/responsive.dart';
 import '../../models/task_model.dart';
 import '../../services/firestore_service.dart';
-import '../../utils/responsive.dart';
 
 class TaskReviewScreen extends StatefulWidget {
   final String taskId;
@@ -58,15 +58,6 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveHelper.isMobile(context);
-    final gapSize = isMobile ? 12.0 : 16.0;
-    final hPad = ResponsiveHelper.paddingSymmetric(
-      context,
-      mobileH: 16,
-      mobileV: 0,
-      tabletH: 24,
-      desktopH: 32,
-    ).horizontal;
     final df = DateFormat('MMM dd, yyyy • hh:mm a');
 
     return StreamBuilder<TaskModel?>(
@@ -84,12 +75,7 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
         return Scaffold(
           backgroundColor: AppTheme.surface,
           appBar: AppBar(
-            title: ResponsiveText(
-              'Review Submission',
-              mobileSize: 16,
-              tabletSize: 18,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            title: const Text('Review Submission'),
             actions: [
               if (alreadyReviewed)
                 Container(
@@ -100,255 +86,238 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: ResponsiveText(
-                    'Reviewed',
-                    mobileSize: 11,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w500),
-                  ),
+                  child: const Text('Reviewed',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500)),
                 ),
             ],
           ),
           body: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Task Info Banner ──
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppTheme.primary, Color(0xFF1A3A5C)],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        _statusChip(task.status),
-                        const SizedBox(width: 8),
-                        _priorityChip(task.priority),
-                      ]),
-                      const SizedBox(height: 12),
-                      Text(task.title,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 6),
-                      Row(children: [
-                        const Icon(Icons.person_outline_rounded,
-                            color: Colors.white54, size: 15),
-                        const SizedBox(width: 4),
-                        Text(task.assignedToName,
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 13)),
-                        const SizedBox(width: 16),
-                        const Icon(Icons.calendar_today_outlined,
-                            color: Colors.white54, size: 15),
-                        const SizedBox(width: 4),
-                        Text(
-                            'Due: ${DateFormat('MMM dd, yyyy').format(task.dueDate)}',
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 13)),
-                      ]),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // ── Task Description ──
-                _sectionLabel('📋  Task Description'),
-                const SizedBox(height: 8),
-                _card(
-                  child: Text(task.description,
-                      style: const TextStyle(
-                          color: AppTheme.textMid, fontSize: 14, height: 1.6)),
-                ),
-                const SizedBox(height: 20),
-
-                // ── Submission Details ──
-                if (task.submittedAt != null) ...[
-                  _sectionLabel('📤  Submission Details'),
-                  const SizedBox(height: 8),
-                  _card(
+            child: R.wrap(
+                child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _infoRow(Icons.schedule_rounded, 'Submitted At',
-                            df.format(task.submittedAt!)),
-                        if (task.submissionNote != null &&
-                            task.submissionNote!.isNotEmpty) ...[
-                          const Divider(height: 18),
-                          const Text('Intern\'s Note:',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppTheme.textLight,
-                                  fontWeight: FontWeight.w500)),
-                          const SizedBox(height: 6),
-                          Text(task.submissionNote!,
+                        // ── Task Info Banner ──
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppTheme.primary, Color(0xFF1A3A5C)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
+                                _statusChip(task.status),
+                                const SizedBox(width: 8),
+                                _priorityChip(task.priority),
+                              ]),
+                              const SizedBox(height: 12),
+                              Text(task.title,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 6),
+                              Row(children: [
+                                const Icon(Icons.person_outline_rounded,
+                                    color: Colors.white54, size: 15),
+                                const SizedBox(width: 4),
+                                Text(task.assignedToName,
+                                    style: const TextStyle(
+                                        color: Colors.white70, fontSize: 13)),
+                                const SizedBox(width: 16),
+                                const Icon(Icons.calendar_today_outlined,
+                                    color: Colors.white54, size: 15),
+                                const SizedBox(width: 4),
+                                Text(
+                                    'Due: ${DateFormat('MMM dd, yyyy').format(task.dueDate)}',
+                                    style: const TextStyle(
+                                        color: Colors.white70, fontSize: 13)),
+                              ]),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // ── Task Description ──
+                        _sectionLabel('📋  Task Description'),
+                        const SizedBox(height: 8),
+                        _card(
+                          child: Text(task.description,
                               style: const TextStyle(
-                                  color: AppTheme.textDark,
+                                  color: AppTheme.textMid,
                                   fontSize: 14,
-                                  height: 1.5)),
+                                  height: 1.6)),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // ── Submission Details ──
+                        if (task.submittedAt != null) ...[
+                          _sectionLabel('📤  Submission Details'),
+                          const SizedBox(height: 8),
+                          _card(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _infoRow(Icons.schedule_rounded, 'Submitted At',
+                                    df.format(task.submittedAt!)),
+                                if (task.submissionNote != null &&
+                                    task.submissionNote!.isNotEmpty) ...[
+                                  const Divider(height: 18),
+                                  const Text('Intern\'s Note:',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppTheme.textLight,
+                                          fontWeight: FontWeight.w500)),
+                                  const SizedBox(height: 6),
+                                  Text(task.submissionNote!,
+                                      style: const TextStyle(
+                                          color: AppTheme.textDark,
+                                          fontSize: 14,
+                                          height: 1.5)),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                         ],
+
+                        // ── Submitted Links ──
+                        if (task.links.isNotEmpty) ...[
+                          _sectionLabel(
+                              '🔗  Submitted Links (${task.links.length})'),
+                          const SizedBox(height: 8),
+                          ...task.links.map((l) => _linkTile(l)),
+                          const SizedBox(height: 16),
+                        ] else if (task.status == 'submitted') ...[
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.07),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: Colors.orange.withOpacity(0.3)),
+                            ),
+                            child: const Row(children: [
+                              Icon(Icons.info_outline_rounded,
+                                  color: Colors.orange, size: 18),
+                              SizedBox(width: 8),
+                              Text('No links attached — text note only.',
+                                  style: TextStyle(
+                                      color: Colors.orange, fontSize: 13)),
+                            ]),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // ── Previous Review (if re-submitted) ──
+                        if (alreadyReviewed) ...[
+                          _sectionLabel('📝  Previous Review'),
+                          const SizedBox(height: 8),
+                          _previousReviewCard(task),
+                          const SizedBox(height: 20),
+                        ],
+
+                        // ── Review Form ──
+                        if (task.status == 'submitted') ...[
+                          _sectionLabel('✍️  Your Review'),
+                          const SizedBox(height: 10),
+
+                          // Review status selector
+                          Row(
+                            children: [
+                              _reviewOption(
+                                  'approved', '✅ Approve', AppTheme.accent),
+                              const SizedBox(width: 8),
+                              _reviewOption(
+                                  'needs_revision', '🔄 Revise', Colors.orange),
+                              const SizedBox(width: 8),
+                              _reviewOption('rejected', '❌ Reject', Colors.red),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Remark text field
+                          TextField(
+                            controller: _remarkCtrl,
+                            maxLines: 5,
+                            decoration: InputDecoration(
+                              hintText: _remarkHint(_reviewStatus),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFFE2E8F0))),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFFE2E8F0))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: AppTheme.accent, width: 2)),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Submit Review Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton.icon(
+                              onPressed: _isSubmitting
+                                  ? null
+                                  : () => _submitReview(task),
+                              icon: _isSubmitting
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.5))
+                                  : Icon(_reviewIcon(_reviewStatus)),
+                              label: Text(
+                                _isSubmitting ? 'Submitting…' : 'Submit Review',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 15),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _reviewColor(_reviewStatus),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14)),
+                              ),
+                            ),
+                          ),
+                        ] else if (!alreadyReviewed) ...[
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppTheme.textLight.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Waiting for intern to submit this task.',
+                                style: TextStyle(
+                                    color: AppTheme.textLight, fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 40),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Submitted Links ──
-                if (task.links.isNotEmpty) ...[
-                  _sectionLabel('🔗  Submitted Links (${task.links.length})'),
-                  const SizedBox(height: 8),
-                  ...task.links.map((l) => _linkTile(l)),
-                  const SizedBox(height: 16),
-                ] else if (task.status == 'submitted') ...[
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.07),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                    ),
-                    child: const Row(children: [
-                      Icon(Icons.info_outline_rounded,
-                          color: Colors.orange, size: 18),
-                      SizedBox(width: 8),
-                      Text('No links attached — text note only.',
-                          style: TextStyle(color: Colors.orange, fontSize: 13)),
-                    ]),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Previous Review (if re-submitted) ──
-                if (alreadyReviewed) ...[
-                  _sectionLabel('📝  Previous Review'),
-                  const SizedBox(height: 8),
-                  _previousReviewCard(task),
-                  const SizedBox(height: 20),
-                ],
-
-                // ── Review Form ──
-                if (task.status == 'submitted') ...[
-                  _sectionLabel('✍️  Your Review'),
-                  SizedBox(height: gapSize),
-
-                  // Review status selector
-                  Wrap(
-                    spacing: gapSize,
-                    runSpacing: gapSize,
-                    children: [
-                      Expanded(
-                          child: _reviewOption(
-                              'approved', '✅ Approve', AppTheme.accent)),
-                      Expanded(
-                          child: _reviewOption(
-                              'needs_revision', '🔄 Revise', Colors.orange)),
-                      Expanded(
-                          child: _reviewOption(
-                              'rejected', '❌ Reject', Colors.red)),
-                    ],
-                  ),
-                  SizedBox(height: gapSize * 1.5),
-
-                  // Remark text field
-                  TextField(
-                    controller: _remarkCtrl,
-                    maxLines: isMobile ? 4 : 5,
-                    style: TextStyle(
-                      fontSize: ResponsiveHelper.fontSize(context,
-                          mobileSize: 13, tabletSize: 14),
-                      color: AppTheme.textDark,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: _remarkHint(_reviewStatus),
-                      hintStyle: TextStyle(
-                        fontSize: ResponsiveHelper.fontSize(context,
-                            mobileSize: 12, tabletSize: 13),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: Color(0xFFE2E8F0))),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: Color(0xFFE2E8F0))),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                              color: AppTheme.accent, width: 2)),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: ResponsiveHelper.paddingSymmetric(context,
-                                mobileH: 14, mobileV: 0, tabletH: 16)
-                            .horizontal,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: gapSize * 2),
-
-                  // Submit Review Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: isMobile ? 48 : 52,
-                    child: ElevatedButton.icon(
-                      onPressed:
-                          _isSubmitting ? null : () => _submitReview(task),
-                      icon: _isSubmitting
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2.5))
-                          : Icon(_reviewIcon(_reviewStatus)),
-                      label: ResponsiveText(
-                        _isSubmitting ? 'Submitting…' : 'Submit Review',
-                        mobileSize: 14,
-                        tabletSize: 15,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _reviewColor(_reviewStatus),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
-                      ),
-                    ),
-                  ),
-                ] else if (!alreadyReviewed) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveHelper.paddingSymmetric(context,
-                              mobileH: 16, mobileV: 0, tabletH: 20)
-                          .horizontal,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.textLight.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: ResponsiveText(
-                        'Waiting for intern to submit this task.',
-                        mobileSize: 13,
-                        tabletSize: 14,
-                        style: const TextStyle(color: AppTheme.textLight),
-                      ),
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 40),
-              ],
-            ),
+                    ))),
           ),
         );
       },
@@ -357,24 +326,26 @@ class _TaskReviewScreenState extends State<TaskReviewScreen> {
 
   Widget _reviewOption(String value, String label, Color color) {
     final selected = _reviewStatus == value;
-    return GestureDetector(
-      onTap: () => setState(() => _reviewStatus = value),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 11),
-        decoration: BoxDecoration(
-          color: selected ? color : color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? color : color.withOpacity(0.3)),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _reviewStatus = value),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          decoration: BoxDecoration(
+            color: selected ? color : color.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+            border:
+                Border.all(color: selected ? color : color.withOpacity(0.3)),
+          ),
+          child: Text(label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: selected ? Colors.white : color,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              )),
         ),
-        child: ResponsiveText(label,
-            textAlign: TextAlign.center,
-            mobileSize: 11,
-            tabletSize: 12,
-            style: TextStyle(
-              color: selected ? Colors.white : color,
-              fontWeight: FontWeight.w600,
-            )),
       ),
     );
   }

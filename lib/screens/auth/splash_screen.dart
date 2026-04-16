@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../main.dart';
-import '../../utils/responsive.dart';
 import '../intern/intern_dashboard.dart';
 import '../admin/admin_dashboard.dart';
 import 'login_screen.dart';
@@ -73,13 +72,10 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final logoSize = ResponsiveHelper.fontSize(context,
-        mobileSize: 90, tabletSize: 110, desktopSize: 130);
-    final logoIconSize = ResponsiveHelper.fontSize(context,
-        mobileSize: 46, tabletSize: 56, desktopSize: 66);
-    final gapSize = ResponsiveHelper.hp(context, 3);
-    final loaderSize = ResponsiveHelper.fontSize(context,
-        mobileSize: 32, tabletSize: 40, desktopSize: 48);
+    final logoSize = 90.0;
+    final logoIconSize = 46.0;
+    final gapSize = 36.0;
+    final loaderSize = 32.0;
 
     return Scaffold(
       backgroundColor: AppTheme.primary,
@@ -126,25 +122,21 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                     SizedBox(height: gapSize),
-                    ResponsiveText(
+                    Text(
                       'internee.pk',
-                      mobileSize: 26,
-                      tabletSize: 30,
-                      desktopSize: 36,
                       style: const TextStyle(
                         color: Colors.white,
+                        fontSize: 26,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.5,
                       ),
                     ),
                     SizedBox(height: gapSize * 0.3),
-                    ResponsiveText(
+                    Text(
                       'Intern Management System',
-                      mobileSize: 12,
-                      tabletSize: 13,
-                      desktopSize: 14,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.55),
+                        fontSize: 12,
                         letterSpacing: 1,
                       ),
                     ),
